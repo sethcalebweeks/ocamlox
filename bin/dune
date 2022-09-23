@@ -1,0 +1,9 @@
+(executable
+ (public_name ocamlox)
+ (name main)
+ (libraries ocamlox))
+
+; (rule
+;  (alias run)
+;  (action
+;   (run ocamlox args)))
