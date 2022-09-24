@@ -42,7 +42,7 @@
 
 %token <string> IDENTIFIER
 %token <string> STRING
-%token <int> NUMBER
+%token <float> NUMBER
 
 %start <Ast.expr> prog
 
@@ -53,5 +53,8 @@ prog:
   ;
 
 expr:
-  | OR { Or }
+  | n = NUMBER { Number n }
+  | id = IDENTIFIER { Identifier id }
+  | e1 = expr; PLUS; e2 = expr { Binop (e1, Add, e2) }
+  | e1 = expr; OR; e2 = expr { Control (e1, Or, e2) }
   ;

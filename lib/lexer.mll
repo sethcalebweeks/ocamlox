@@ -62,7 +62,7 @@ rule read_token = parse
   | "//" { read_single_line_comment lexbuf }
   | "/*" { read_multi_line_comment lexbuf }
   | '"' { read_string (Buffer.create 17) lexbuf }
-  | number { NUMBER (int_of_string (Lexing.lexeme lexbuf))}
+  | number { NUMBER (float_of_string (Lexing.lexeme lexbuf))}
   | id { IDENTIFIER (Lexing.lexeme lexbuf) }
   | whitespace { read_token lexbuf }
   | newline { next_line lexbuf; read_token lexbuf }
