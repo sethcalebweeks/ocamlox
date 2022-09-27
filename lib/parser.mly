@@ -52,9 +52,44 @@ prog:
   | e = expr; EOF { e }
   ;
 
+// expr:
+//   | n = NUMBER { Number n }
+//   | id = IDENTIFIER { Identifier id }
+//   | e1 = expr; PLUS; e2 = expr { Binop (e1, Add, e2) }
+//   | e1 = expr; GREATER; e2 = expr { Binop (e1, GT, e2) }
+//   | e1 = expr; EQUAL; e2 = expr { Binop (e1, EQ, e2) }
+//   | e1 = expr; GREATER_EQUAL; e2 = expr { Binop (e1, GTE, e2) }
+//   | e1 = expr; OR; e2 = expr { Control (e1, Or, e2) }
+//   ;
+
 expr:
+  | v = value { Value v }
+  | l = expr; binop = binop; r = expr; { Binop (l, binop, r) }
+  | unop = unop; e = expr; { Unop (unop, e) }
+  | LEFT_PAREN; e = expr; RIGHT_PAREN; { Grouping e }
+  ;
+
+binop:
+  | EQUAL_EQUAL { Equal }
+  | BANG_EQUAL { NotEqual }
+  | GREATER { Greater }
+  | GREATER_EQUAL { GreaterEqual }
+  | LESS { Less }
+  | LESS_EQUAL { LessEqual }
+  | PLUS { Add }
+  | MINUS { Subtract }
+  | STAR { Multiply }
+  | SLASH { Divide }
+  ;
+
+unop:
+  | BANG { Not }
+  | MINUS { Negate }
+
+value:
   | n = NUMBER { Number n }
-  | id = IDENTIFIER { Identifier id }
-  | e1 = expr; PLUS; e2 = expr { Binop (e1, Add, e2) }
-  | e1 = expr; OR; e2 = expr { Control (e1, Or, e2) }
+  | s = STRING { String s }
+  | TRUE { Boolean true }
+  | FALSE { Boolean false }
+  | NIL { Nil }
   ;

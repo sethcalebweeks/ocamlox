@@ -17,7 +17,7 @@ let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 
 let number = '-'? (digit '.')? digit+ 
-let id = (alpha) (alpha|digit|'_')*
+let id = (alpha|'_') (alpha|digit|'_')*
 let whitespace = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
 
@@ -33,14 +33,14 @@ rule read_token = parse
   | ";" { SEMICOLON }
   | "/" { SLASH }
   | "*" { STAR }
-  | "!=" { BANG_EQUAL }
   | "!" { BANG }
-  | "==" { EQUAL_EQUAL }
+  | "!=" { BANG_EQUAL }
   | "=" { EQUAL }
-  | ">=" { GREATER_EQUAL }
+  | "==" { EQUAL_EQUAL }
   | ">" { GREATER }
-  | "<=" { LESS_EQUAL }
+  | ">=" { GREATER_EQUAL }
   | "<" { LESS }
+  | "<=" { LESS_EQUAL }
 
   (* Keywords *)
   | "and" { AND }
