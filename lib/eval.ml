@@ -1,4 +1,5 @@
 open Ast
+open Print
 
 let eval_binop = function
   | Literal (Number l), Add, Literal (Number r) -> Literal (Number (l +. r))
@@ -22,10 +23,16 @@ let eval_unop = function
   | Not, Literal _ -> Literal (Boolean false)
   | _ -> raise (Invalid_argument "Invalid unary operation")
 
-let rec eval = function
+let rec eval_expr = function
   | Literal l -> Literal l
   | Identifier id -> Identifier id
   | Binop (l, op, r) -> eval_binop (l, op, r)
   | Unop (op, e) -> eval_unop (op, e)
-  | Grouping e -> eval e
+  | Grouping e -> eval_expr e
   | Control (l, control, r) -> Control (l, control, r)
+
+let eval_stmt = function
+  | ExprStmt _ -> ()
+  | PrintStmt e -> e |> eval_expr |> print
+
+let eval = List.iter eval_stmt

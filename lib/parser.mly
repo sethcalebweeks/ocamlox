@@ -43,12 +43,21 @@
 %token <string> STRING
 %token <float> NUMBER
 
-%start <Ast.expr> prog
+%start <Ast.program> prog
 
 %%
 
+// prog:
+//   | e = expr; EOF { e }
+//   ;
+
 prog:
-  | e = expr; EOF { e }
+  | s = statement+; EOF { s }
+  ;
+
+statement:
+  | e = expr; SEMICOLON { ExprStmt e }
+  | PRINT; e = expr; SEMICOLON { PrintStmt e }
   ;
 
 expr:

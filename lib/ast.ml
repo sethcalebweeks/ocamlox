@@ -28,3 +28,9 @@ type expr =
   | Unop of op * expr
   | Grouping of expr
   | Control of expr * control * expr
+
+type statement = 
+  | ExprStmt of expr
+  | PrintStmt of expr
+
+type program = statement list
