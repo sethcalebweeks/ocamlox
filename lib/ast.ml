@@ -15,14 +15,14 @@ type op =
 type control = 
   | Or
 
-type value =
+type literal =
   | String of string
   | Number of float
   | Boolean of bool
   | Nil
 
 type expr =
-  | Value of value
+  | Literal of literal
   | Identifier of string
   | Binop of expr * op * expr
   | Unop of op * expr
