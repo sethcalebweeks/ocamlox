@@ -1,6 +1,8 @@
 open Ast
 open Print
 
+let globals = Hashtbl.create 10
+
 let eval_binop = function
   | Literal (Number l), Add, Literal (Number r) -> Literal (Number (l +. r))
   | Literal (Number l), Subtract, Literal (Number r) -> Literal (Number (l -. r))
@@ -13,7 +15,8 @@ let eval_binop = function
   | Literal (String l), Add, Literal (String r) -> Literal (String (l ^ r))
   | Literal l, Equal, Literal r -> Literal (Boolean (l = r))
   | Literal l, NotEqual, Literal r -> Literal (Boolean (l <> r))
-  | _ -> raise (Invalid_argument "Invalid binary operation")
+  | l, _, r -> print l; print r; raise (Invalid_argument "Invalid binary operation")
+  (* | _ -> raise (Invalid_argument "Invalid binary operation") *)
 
 let eval_unop = function
   | Negate, Literal (Number n) -> Literal (Number (-.n))
@@ -24,10 +27,10 @@ let eval_unop = function
   | _ -> raise (Invalid_argument "Invalid unary operation")
 
 let rec eval_expr = function
+  | Identifier id -> Hashtbl.find globals id
   | Literal l -> Literal l
-  | Identifier id -> Identifier id
-  | Binop (l, op, r) -> eval_binop (l, op, r)
-  | Unop (op, e) -> eval_unop (op, e)
+  | Binop (l, op, r) -> eval_binop (eval_expr l, op, eval_expr r)
+  | Unop (op, e) -> eval_unop (op, eval_expr e)
   | Grouping e -> eval_expr e
   | Control (l, control, r) -> Control (l, control, r)
 
@@ -35,4 +38,8 @@ let eval_stmt = function
   | ExprStmt _ -> ()
   | PrintStmt e -> e |> eval_expr |> print
 
-let eval = List.iter eval_stmt
+let eval_decl = function
+  | VarDecl (id, e) -> Hashtbl.add globals id (eval_expr e)
+  | Stmt s -> eval_stmt s
+
+let eval = List.iter eval_decl

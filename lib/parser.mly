@@ -52,7 +52,12 @@
 //   ;
 
 prog:
-  | s = statement+; EOF { s }
+  | d = declaration+; EOF { d }
+  ;
+
+declaration:
+  | VAR; i = IDENTIFIER; EQUAL; e = expr; SEMICOLON { VarDecl (i, e) }
+  | s = statement { Stmt s } 
   ;
 
 statement:
@@ -62,6 +67,7 @@ statement:
 
 expr:
   | l = literal { Literal l }
+  | i = IDENTIFIER { Identifier i }
   | l = expr; binop = binop; r = expr; { Binop (l, binop, r) }
   | unop = unop; e = expr; { Unop (unop, e) }
   | LEFT_PAREN; e = expr; RIGHT_PAREN; { Grouping e }
