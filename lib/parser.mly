@@ -66,6 +66,7 @@ statement:
   ;
 
 expr:
+  | i = IDENTIFIER; EQUAL; e = expr; { Assign (i, e) }
   | l = literal { Literal l }
   | i = IDENTIFIER { Identifier i }
   | l = expr; binop = binop; r = expr; { Binop (l, binop, r) }

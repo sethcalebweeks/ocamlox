@@ -24,6 +24,7 @@ let print_literal = function
   | Nil -> print_string "nil"
 
 let rec print = function
+  | Assign (_, e) -> print e
   | Literal l -> print_literal l
   | Identifier id -> print_string id
   | Binop (l, op, r) -> print l; print_op op; print r

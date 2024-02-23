@@ -27,6 +27,7 @@ let eval_unop = function
   | _ -> raise (Invalid_argument "Invalid unary operation")
 
 let rec eval_expr = function
+  | Assign (id, e) -> let v = eval_expr e in Hashtbl.replace globals id v; v
   | Identifier id -> Hashtbl.find globals id
   | Literal l -> Literal l
   | Binop (l, op, r) -> eval_binop (eval_expr l, op, eval_expr r)
@@ -35,7 +36,7 @@ let rec eval_expr = function
   | Control (l, control, r) -> Control (l, control, r)
 
 let eval_stmt = function
-  | ExprStmt _ -> ()
+  | ExprStmt e -> eval_expr e |> ignore
   | PrintStmt e -> e |> eval_expr |> print
 
 let eval_decl = function

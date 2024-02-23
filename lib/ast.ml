@@ -22,6 +22,7 @@ type literal =
   | Nil
 
 type expr =
+  | Assign of string * expr
   | Literal of literal
   | Identifier of string
   | Binop of expr * op * expr
