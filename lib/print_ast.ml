@@ -35,6 +35,7 @@ let rec print_expr = function
 let print_stmt = function
   | ExprStmt e -> print_string "ExprStmt {"; print_expr e; print_string "}\n"
   | PrintStmt e -> print_string "PrintStmt {"; print_expr e; print_string "}\n"
+  | BlockStmt _ -> print_string "BlockStmt {}"
 
 let print_decl = function
   | VarDecl (id, e) -> print_string "VarDecl {"; print_string id; print_string ", "; print_expr e; print_string "}\n"

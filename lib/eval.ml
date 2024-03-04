@@ -1,7 +1,24 @@
 open Ast
 open Print
 
-let globals = Hashtbl.create 10
+type 'a scope = 
+  | Global of 'a
+  | Block of 'a scope * 'a
+
+let global = Global (Hashtbl.create 10)
+
+let declare id v = function
+  | Global g -> Hashtbl.add g id v
+  | Block (_, b) -> Hashtbl.add b id v
+
+let assign id v = function
+  | Global g -> Hashtbl.replace g id v; v
+  | Block (_, b) -> Hashtbl.replace b id v; v
+
+let rec eval_id id = function
+  | Global g -> Hashtbl.find g id
+  | Block (parent, b) -> try Hashtbl.find b id with 
+    Not_found -> eval_id id parent
 
 let eval_binop = function
   | Literal (Number l), Add, Literal (Number r) -> Literal (Number (l +. r))
@@ -26,21 +43,22 @@ let eval_unop = function
   | Not, Literal _ -> Literal (Boolean false)
   | _ -> raise (Invalid_argument "Invalid unary operation")
 
-let rec eval_expr = function
-  | Assign (id, e) -> let v = eval_expr e in Hashtbl.replace globals id v; v
-  | Identifier id -> Hashtbl.find globals id
+let rec eval_expr scope = function
+  | Assign (id, e) -> assign id (eval_expr scope e) scope
+  | Identifier id -> eval_id id scope
   | Literal l -> Literal l
-  | Binop (l, op, r) -> eval_binop (eval_expr l, op, eval_expr r)
-  | Unop (op, e) -> eval_unop (op, eval_expr e)
-  | Grouping e -> eval_expr e
+  | Binop (l, op, r) -> eval_binop (eval_expr scope l, op, eval_expr scope r)
+  | Unop (op, e) -> eval_unop (op, eval_expr scope e)
+  | Grouping e -> eval_expr scope e
   | Control (l, control, r) -> Control (l, control, r)
 
-let eval_stmt = function
-  | ExprStmt e -> eval_expr e |> ignore
-  | PrintStmt e -> e |> eval_expr |> print
+let rec eval_stmt scope = function
+  | ExprStmt e -> eval_expr scope e |> ignore
+  | PrintStmt e -> e |> eval_expr scope |> print
+  | BlockStmt b -> List.iter (eval_decl (Block (scope, Hashtbl.create 10))) b
 
-let eval_decl = function
-  | VarDecl (id, e) -> Hashtbl.add globals id (eval_expr e)
-  | Stmt s -> eval_stmt s
+and eval_decl scope = function
+  | VarDecl (id, e) -> declare id (eval_expr scope e) scope
+  | Stmt s -> eval_stmt scope s
 
-let eval = List.iter eval_decl
+let eval = eval_decl global |> List.iter 

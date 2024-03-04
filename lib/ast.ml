@@ -33,8 +33,9 @@ type expr =
 type statement = 
   | ExprStmt of expr
   | PrintStmt of expr
+  | BlockStmt of declaration list
 
-type declaration = 
+and declaration = 
   | VarDecl of string * expr
   | Stmt of statement
 

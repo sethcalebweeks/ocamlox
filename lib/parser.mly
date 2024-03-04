@@ -57,12 +57,14 @@ prog:
 
 declaration:
   | VAR; i = IDENTIFIER; EQUAL; e = expr; SEMICOLON { VarDecl (i, e) }
+  | VAR; i = IDENTIFIER; SEMICOLON { VarDecl (i, Literal Nil) }
   | s = statement { Stmt s } 
   ;
 
 statement:
   | e = expr; SEMICOLON { ExprStmt e }
   | PRINT; e = expr; SEMICOLON { PrintStmt e }
+  | LEFT_BRACE; s = declaration*; RIGHT_BRACE { BlockStmt s }
   ;
 
 expr:
