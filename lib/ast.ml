@@ -32,6 +32,7 @@ type expr =
 type statement = 
   | ExprStmt of expr
   | IfStmt of expr * statement * statement
+  | WhileStmt of expr * statement
   | PrintStmt of expr
   | BlockStmt of declaration list
 

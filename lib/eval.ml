@@ -11,9 +11,11 @@ let declare id v = function
   | Global g -> Hashtbl.add g id v
   | Block (_, b) -> Hashtbl.add b id v
 
-let assign id v = function
+let rec assign id v = function
   | Global g -> Hashtbl.replace g id v; v
-  | Block (_, b) -> Hashtbl.replace b id v; v
+  | Block (parent, b) -> match Hashtbl.find_opt b id with
+    | None -> assign id v parent
+    | _ -> Hashtbl.replace b id v; v
 
 let rec eval_id id = function
   | Global g -> Hashtbl.find g id
@@ -62,6 +64,10 @@ let rec eval_stmt scope = function
   | IfStmt (c, t, f) -> 
     if eval_expr scope c = Literal (Boolean true) then eval_stmt scope t
     else eval_stmt scope f
+  | WhileStmt (c, b) -> 
+    while eval_expr scope c = Literal (Boolean true) do
+      eval_stmt scope b
+    done
   | PrintStmt e -> e |> eval_expr scope |> print
   | BlockStmt b -> List.iter (eval_decl (Block (scope, Hashtbl.create 10))) b
 
