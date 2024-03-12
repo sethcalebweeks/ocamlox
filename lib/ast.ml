@@ -11,9 +11,8 @@ type op =
   | Less
   | LessEqual
   | NotEqual
-
-type control = 
   | Or
+  | And
 
 type literal =
   | String of string
@@ -23,15 +22,16 @@ type literal =
 
 type expr =
   | Assign of string * expr
+  | Logical of expr * op * expr
   | Literal of literal
   | Identifier of string
   | Binop of expr * op * expr
   | Unop of op * expr
   | Grouping of expr
-  | Control of expr * control * expr
 
 type statement = 
   | ExprStmt of expr
+  | IfStmt of expr * statement * statement
   | PrintStmt of expr
   | BlockStmt of declaration list
 

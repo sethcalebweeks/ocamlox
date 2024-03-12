@@ -45,15 +45,23 @@ let eval_unop = function
 
 let rec eval_expr scope = function
   | Assign (id, e) -> assign id (eval_expr scope e) scope
+  | Logical (l, op, r) -> eval_logical scope (eval_expr scope l, op, r)
   | Identifier id -> eval_id id scope
   | Literal l -> Literal l
   | Binop (l, op, r) -> eval_binop (eval_expr scope l, op, eval_expr scope r)
   | Unop (op, e) -> eval_unop (op, eval_expr scope e)
   | Grouping e -> eval_expr scope e
-  | Control (l, control, r) -> Control (l, control, r)
+
+and eval_logical scope = function
+  | l, Or, r -> if l = Literal (Boolean true) then l else eval_expr scope r
+  | l, And, r -> if l = Literal (Boolean false) then l else eval_expr scope r
+  | _ -> raise (Invalid_argument "Invalid logical operation")
 
 let rec eval_stmt scope = function
   | ExprStmt e -> eval_expr scope e |> ignore
+  | IfStmt (c, t, f) -> 
+    if eval_expr scope c = Literal (Boolean true) then eval_stmt scope t
+    else eval_stmt scope f
   | PrintStmt e -> e |> eval_expr scope |> print
   | BlockStmt b -> List.iter (eval_decl (Block (scope, Hashtbl.create 10))) b
 

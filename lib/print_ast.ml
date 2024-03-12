@@ -13,8 +13,7 @@ let print_op = function
   | LessEqual -> print_string " <= "
   | Negate -> print_string " -"
   | Not -> print_string " !"
-
-let print_control = function
+  | And -> print_string " and "
   | Or -> print_string " or "
 
 let print_literal = function
@@ -25,15 +24,16 @@ let print_literal = function
 
 let rec print_expr = function
   | Assign (id, e) -> print_string "Assign {"; print_string id; print_string ", "; print_expr e; print_string "}"
+  | Logical (l, op, r) -> print_expr l; print_op op; print_expr r
   | Literal l -> print_literal l
   | Identifier id -> print_string "Id {"; print_string id; print_string "}"
   | Binop (l, op, r) -> print_expr l; print_op op; print_expr r
   | Unop (op, e) -> print_op op; print_expr e
   | Grouping e -> print_string "("; print_expr e; print_string ")"
-  | Control (l, control, r) -> print_expr l; print_control control; print_expr r
 
-let print_stmt = function
+let rec print_stmt = function
   | ExprStmt e -> print_string "ExprStmt {"; print_expr e; print_string "}\n"
+  | IfStmt (e, s1, s2) -> print_string "IfStmt {"; print_expr e; print_string ", "; print_stmt s1; print_string ", "; print_stmt s2; print_string "}\n"
   | PrintStmt e -> print_string "PrintStmt {"; print_expr e; print_string "}\n"
   | BlockStmt _ -> print_string "BlockStmt {}"
 

@@ -47,10 +47,6 @@
 
 %%
 
-// prog:
-//   | e = expr; EOF { e }
-//   ;
-
 prog:
   | d = declaration+; EOF { d }
   ;
@@ -63,12 +59,16 @@ declaration:
 
 statement:
   | e = expr; SEMICOLON { ExprStmt e }
+  | IF; LEFT_PAREN; c = expr; RIGHT_PAREN; t = statement; ELSE; f = statement { IfStmt (c, t, f) }
+  | IF; LEFT_PAREN; c = expr; RIGHT_PAREN; t = statement { IfStmt (c, t, BlockStmt []) }
   | PRINT; e = expr; SEMICOLON { PrintStmt e }
   | LEFT_BRACE; s = declaration*; RIGHT_BRACE { BlockStmt s }
   ;
 
 expr:
   | i = IDENTIFIER; EQUAL; e = expr; { Assign (i, e) }
+  | l = expr; AND; r = expr; { Logical (l, And, r) }
+  | l = expr; OR; r = expr; { Logical (l, Or, r) }
   | l = literal { Literal l }
   | i = IDENTIFIER { Identifier i }
   | l = expr; binop = binop; r = expr; { Binop (l, binop, r) }
