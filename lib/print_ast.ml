@@ -35,10 +35,11 @@ let rec print_stmt = function
   | ExprStmt e -> print_string "ExprStmt {"; print_expr e; print_string "}\n"
   | IfStmt (e, s1, s2) -> print_string "IfStmt {"; print_expr e; print_string ", "; print_stmt s1; print_string ", "; print_stmt s2; print_string "}\n"
   | WhileStmt (e, s) -> print_string "WhileStmt {"; print_expr e; print_string ", "; print_stmt s; print_string "}\n"
+  | ForStmt (init, cond, inc, s) -> print_string "ForStmt {"; print_decl init; print_string ", "; print_expr cond; print_string ", "; print_expr inc; print_string ", "; print_stmt s; print_string "}\n"
   | PrintStmt e -> print_string "PrintStmt {"; print_expr e; print_string "}\n"
   | BlockStmt _ -> print_string "BlockStmt {}"
 
-let print_decl = function
+and print_decl = function
   | VarDecl (id, e) -> print_string "VarDecl {"; print_string id; print_string ", "; print_expr e; print_string "}\n"
   | Stmt s -> print_string "Stmt {"; print_stmt s; print_string "}\n"
 

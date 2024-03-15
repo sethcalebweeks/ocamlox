@@ -62,6 +62,7 @@ statement:
   | IF; LEFT_PAREN; c = expr; RIGHT_PAREN; t = statement; ELSE; f = statement { IfStmt (c, t, f) }
   | IF; LEFT_PAREN; c = expr; RIGHT_PAREN; t = statement { IfStmt (c, t, BlockStmt []) }
   | WHILE; LEFT_PAREN; c = expr; RIGHT_PAREN; b = statement { WhileStmt (c, b) }
+  | FOR; LEFT_PAREN; d = declaration; c = expr; SEMICOLON; i = expr; RIGHT_PAREN; b = statement { ForStmt (d, c, i, b) }
   | PRINT; e = expr; SEMICOLON { PrintStmt e }
   | LEFT_BRACE; s = declaration*; RIGHT_BRACE { BlockStmt s }
   ;

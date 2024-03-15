@@ -68,6 +68,12 @@ let rec eval_stmt scope = function
     while eval_expr scope c = Literal (Boolean true) do
       eval_stmt scope b
     done
+  | ForStmt (d, c, i, b) -> 
+    eval_decl scope d;
+    while eval_expr scope c = Literal (Boolean true) do
+      eval_stmt scope b;
+      eval_expr scope i |> ignore
+    done
   | PrintStmt e -> e |> eval_expr scope |> print
   | BlockStmt b -> List.iter (eval_decl (Block (scope, Hashtbl.create 10))) b
 
